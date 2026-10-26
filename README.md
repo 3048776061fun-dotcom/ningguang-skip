@@ -124,6 +124,7 @@ Windows 在 PowerShell 里先执行 `$env:USE_MIRROR=1` 再运行 `build.ps1`。
 | 下载 Android 命令行工具失败 | 网络问题 | 用 `USE_MIRROR=1`，或手动下载放到项目根目录改名 `cmdline-tools.zip` |
 | `SDK location not found` | 没生成 local.properties | 脚本会自动生成；也可以手动写 `sdk.dir=你的SDK路径` |
 | `Unable to find Gradle tasks to build` | 打开错目录 | 打开 `NingguangSkip` 这一层，不是它的父目录 |
+| 一运行就失败（十几秒就红） | 工程不含 `gradle-wrapper.jar` | 脚本和 Actions 都会先装 Gradle 再生成 wrapper，已内置处理 |
 | 依赖下载卡住不动 | 网络问题 | 加 `USE_MIRROR=1`，或配代理 |
 | 装完没反应 / 不跳过 | 无障碍服务没开 | 确认无障碍已开启，并加入电池优化白名单 |
 | 无障碍开关自动关闭 | 部分 ROM 会回收 | 加电池白名单 + 在多任务列表里锁定 App |

@@ -115,6 +115,38 @@ say "安装 Android 平台与构建工具（约 200MB）"
 
 echo "sdk.dir=$SDK_DIR" > "$PROJECT_DIR/local.properties"
 
+# ---------------------------------------------------------------- Gradle
+# 工程里不带 gradle-wrapper.jar，先装一份 Gradle 再让它在本地生成 wrapper
+GRADLE_VERSION="${GRADLE_VERSION:-8.0}"
+GRADLE_HOME="$PROJECT_DIR/.gradle-dist/gradle-$GRADLE_VERSION"
+
+if [[ ! -x "$GRADLE_HOME/bin/gradle" ]]; then
+  if [[ "${USE_MIRROR:-0}" == "1" ]]; then
+    GRADLE_URL="https://mirrors.cloud.tencent.com/gradle/gradle-$GRADLE_VERSION-bin.zip"
+  else
+    GRADLE_URL="https://services.gradle.org/distributions/gradle-$GRADLE_VERSION-bin.zip"
+  fi
+  say "下载 Gradle $GRADLE_VERSION（约 100MB）"
+  mkdir -p "$PROJECT_DIR/.gradle-dist"
+  TMPG="$PROJECT_DIR/gradle-dist.zip"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fL --retry 2 -o "$TMPG" "$GRADLE_URL" || die "Gradle 下载失败，可手动下载放到项目根目录改名 gradle-dist.zip：
+  $GRADLE_URL"
+  else
+    wget -O "$TMPG" "$GRADLE_URL" || die "Gradle 下载失败：$GRADLE_URL"
+  fi
+  unzip -q "$TMPG" -d "$PROJECT_DIR/.gradle-dist"
+  rm -f "$TMPG"
+fi
+GRADLE_BIN="$GRADLE_HOME/bin/gradle"
+[[ -x "$GRADLE_BIN" ]] || die "Gradle 不可用：$GRADLE_BIN"
+
+if [[ ! -f "$PROJECT_DIR/gradle/wrapper/gradle-wrapper.jar" ]]; then
+  say "生成 Gradle Wrapper"
+  "$GRADLE_BIN" wrapper --gradle-version "$GRADLE_VERSION" --distribution-type bin >/dev/null \
+    || die "生成 wrapper 失败"
+fi
+
 # ---------------------------------------------------------------- 编译
 say "编译 APK（首次会下载依赖，可能需要十几分钟）"
 chmod +x ./gradlew

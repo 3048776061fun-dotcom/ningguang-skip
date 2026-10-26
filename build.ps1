@@ -101,6 +101,38 @@ if ($LASTEXITCODE -ne 0) { Die "SDK 组件安装失败，检查网络后重试" 
 # Gradle 也接受正斜杠，避免 Windows 路径里反斜杠需要转义的坑
 Set-Content -Encoding ASCII (Join-Path $ProjectDir "local.properties") "sdk.dir=$($SdkDir.Replace('\','/'))"
 
+# ---------------------------------------------------------------- Gradle
+# 工程里不带 gradle-wrapper.jar，先装一份 Gradle 再让它在本地生成 wrapper
+$GradleVersion = if ($env:GRADLE_VERSION) { $env:GRADLE_VERSION } else { "8.0" }
+$GradleHome = Join-Path $ProjectDir ".gradle-dist\gradle-$GradleVersion"
+$GradleBin = Join-Path $GradleHome "bin\gradle.bat"
+
+if (-not (Test-Path $GradleBin)) {
+  $GradleUrl = if ($env:USE_MIRROR -eq "1") {
+    "https://mirrors.cloud.tencent.com/gradle/gradle-$GradleVersion-bin.zip"
+  } else {
+    "https://services.gradle.org/distributions/gradle-$GradleVersion-bin.zip"
+  }
+  Say "下载 Gradle $GradleVersion（约 100MB）"
+  $gzip = Join-Path $ProjectDir "gradle-dist.zip"
+  try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Invoke-WebRequest -Uri $GradleUrl -OutFile $gzip -UseBasicParsing
+  } catch {
+    Die "Gradle 下载失败，可手动下载放到项目根目录改名 gradle-dist.zip：
+  $GradleUrl"
+  }
+  Expand-Archive -Path $gzip -DestinationPath (Join-Path $ProjectDir ".gradle-dist") -Force
+  Remove-Item $gzip -Force
+}
+if (-not (Test-Path $GradleBin)) { Die "Gradle 不可用：$GradleBin" }
+
+if (-not (Test-Path (Join-Path $ProjectDir "gradle\wrapper\gradle-wrapper.jar"))) {
+  Say "生成 Gradle Wrapper"
+  & $GradleBin wrapper --gradle-version $GradleVersion --distribution-type bin
+  if ($LASTEXITCODE -ne 0) { Die "生成 wrapper 失败" }
+}
+
 # ---------------------------------------------------------------- 编译
 Say "编译 APK（首次会下载依赖，可能需要十几分钟）"
 & (Join-Path $ProjectDir "gradlew.bat") assembleDebug --no-daemon

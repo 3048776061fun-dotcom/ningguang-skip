@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
@@ -29,7 +28,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ningguang.skip.ui.theme.GlassDarkBottom
 import com.ningguang.skip.ui.theme.GlassDarkTop
@@ -196,12 +194,6 @@ fun Modifier.ningguangGlass(
             }
         }
 }
-
-/** 兼容处理：Android 12 以下没有 RenderEffect，退化成无模糊的纯渐变玻璃 */
-fun Modifier.ningguangBlur(radius: Dp): Modifier =
-    if (Build.VERSION.SDK_INT >= 31 && NingguangConfig.enabled) {
-        this.blur(radius, blendedEdgeColor = Color.Transparent)
-    } else this
 
 /* ---------------------------------------------------------------------------
  *  全屏背景：呼吸流动的两团大光斑

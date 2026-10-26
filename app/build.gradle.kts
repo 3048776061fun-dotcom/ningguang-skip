@@ -13,9 +13,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
-
-        // 内置规则随包体分发
-        resourceConfigurations += setOf("zh", "en")
     }
 
     buildTypes {
@@ -34,12 +31,21 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
-        freeCompilerArgs += listOf("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
+        // 一批 API 在当前版本仍是实验性的，统一 opt-in，避免严格模式下被判为错误
+        freeCompilerArgs += listOf(
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-opt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi",
+            "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-opt-in=androidx.compose.animation.ExperimentalAnimationApi"
+        )
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
+        // 必须与根 build.gradle.kts 里的 Kotlin 版本严格对应：
+        // Kotlin 1.9.24 → Compose Compiler 1.5.14（1.5.15 是针对 Kotlin 1.9.25 的，混用会直接编译失败）
         kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
@@ -50,7 +56,10 @@ android {
 }
 
 dependencies {
-    implementation(platform("androidx.compose:compose-bom:2024.02.00"))
+    // BOM 必须与下面的 Compose Compiler 对齐：
+    //   BOM 2023.10.01（Compose 1.5.4） + Compiler 1.5.14 + Kotlin 1.9.24 —— 官方验证组合
+    //   不要单独升级其中某一个，Compose 的 runtime 与 compiler 有版本校验
+    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")

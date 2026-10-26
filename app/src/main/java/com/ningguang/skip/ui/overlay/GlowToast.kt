@@ -49,7 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import com.ningguang.skip.ui.glow.ningguangGlass
 import com.ningguang.skip.ui.theme.GlowCyan
 import com.ningguang.skip.ui.theme.NingguangTheme
@@ -108,7 +108,7 @@ object GlowToast {
         val lifecycleOwner = OverlayLifecycleOwner().apply { start() }
         val composeView = ComposeView(context).apply {
             ViewTreeLifecycleOwner.set(this, lifecycleOwner)
-            setViewTreeSavedStateRegistryOwner(lifecycleOwner)
+            ViewTreeSavedStateRegistryOwner.set(this, lifecycleOwner)
             setContent {
                 NingguangTheme {
                     val payload by current.collectAsStateWithLifecycle()

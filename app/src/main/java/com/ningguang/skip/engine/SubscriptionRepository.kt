@@ -78,7 +78,13 @@ object SubscriptionRepository {
 
     /** 检查全部订阅（串行，避免同时打多个源） */
     suspend fun checkAll(): List<UpdateResult> = withContext(Dispatchers.IO) {
-        Prefs.subscriptions.filter { it.enabled }.map { check(it) }
+        val results = ArrayList<UpdateResult>()
+        // 用 for 而不是 map：map 的 lambda 不是 suspend，里面不能调用挂起函数
+        for (sub in Prefs.subscriptions.filter { it.enabled }) {
+            results += check(sub)
+            Prefs.updateSubscription(sub)
+        }
+        results
     }
 
     /** 校验并添加一个订阅：先拉一次，拉不通就不写进列表，避免留下一个坏源每天重试 */

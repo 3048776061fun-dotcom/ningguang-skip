@@ -32,7 +32,8 @@ class SubscriptionWorker(appContext: Context, params: WorkerParameters) :
         var failed = 0
         var added = 0
         var updated = 0
-        subs.forEach { sub ->
+        // 用 for 而不是 forEach：forEach 的 lambda 不是 suspend，里面不能调用挂起函数
+        for (sub in subs) {
             val result = SubscriptionRepository.refresh(sub)
             if (result.ok) {
                 added += result.added
