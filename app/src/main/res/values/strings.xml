@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">凝光跳过</string>
+    <string name="accessibility_service_label">凝光跳过（广告跳过服务）</string>
+    <string name="accessibility_service_description">
+        凝光跳过需要无障碍服务来识别屏幕上的「跳过」「关闭广告」等按钮并代替你点击。
+        本服务仅读取当前窗口的控件文本与控件 ID 用于匹配广告按钮，不会收集、上传或存储你的任何输入内容。
+        开启后可在设置中随时停用。
+    </string>
+    <string name="channel_skip_name">跳过提醒</string>
+    <string name="channel_skip_desc">跳过广告时显示轻量提示</string>
+</resources>

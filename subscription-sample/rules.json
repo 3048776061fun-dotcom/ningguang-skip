@@ -1,0 +1,64 @@
+{
+  "id": "ng-sample",
+  "name": "凝光规则 · 示例订阅",
+  "author": "ningguang",
+  "version": 1,
+  "updateUrl": "https://example.com/ningguang-rules/rules.json",
+  "rules": [
+    {
+      "id": "sample_douyin",
+      "name": "抖音 · 开屏与信息流",
+      "appId": "com.ss.android.ugc.aweme",
+      "texts": "跳过|跳过广告|关闭广告",
+      "ids": "iv_skip|tt_splash_skip",
+      "excludeTexts": "跳过登录",
+      "action": "click",
+      "delayMs": 0,
+      "enabled": true
+    },
+    {
+      "id": "sample_kuaishou",
+      "name": "快手 · 开屏广告",
+      "appId": "com.smile.gifmaker",
+      "texts": "跳过|跳过广告",
+      "ids": "skip",
+      "excludeTexts": "",
+      "action": "click",
+      "delayMs": 0,
+      "enabled": true
+    },
+    {
+      "id": "sample_qqmusic",
+      "name": "QQ音乐 · 启动广告",
+      "appId": "com.tencent.qqmusic",
+      "texts": "跳过",
+      "ids": "",
+      "excludeTexts": "跳过登录",
+      "action": "click",
+      "delayMs": 200,
+      "enabled": true
+    },
+    {
+      "id": "sample_youku_back",
+      "name": "优酷 · 整屏广告直接返回",
+      "appId": "com.youku.phone",
+      "texts": "查看详情|立即下载",
+      "ids": "",
+      "excludeTexts": "",
+      "action": "back",
+      "delayMs": 0,
+      "enabled": true
+    },
+    {
+      "id": "sample_browser_record",
+      "name": "浏览器 · 只记录不动作（调试用）",
+      "appId": "com.android.browser",
+      "texts": "关闭广告",
+      "ids": "",
+      "excludeTexts": "",
+      "action": "record",
+      "delayMs": 0,
+      "enabled": true
+    }
+  ]
+}
