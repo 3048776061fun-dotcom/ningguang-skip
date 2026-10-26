@@ -223,11 +223,13 @@ fun SettingsScreen() {
                     checked = settings.overlayToast && overlayOk,
                     glow = GlowCyan,
                     onCheckedChange = { want ->
+                        // 未授权时先跳授权页，本次不改设置（用 if/else 而不是 return@，
+                        // 因为 onCheckedChange 不是 inline lambda，带标签返回不合法）
                         if (want && !overlayOk) {
                             openOverlayPermissionSettings(context)
-                            return@NingguangSwitch
+                        } else {
+                            Prefs.updateSettings(settings.copy(overlayToast = want))
                         }
-                        Prefs.updateSettings(settings.copy(overlayToast = want))
                     }
                 )
             }
