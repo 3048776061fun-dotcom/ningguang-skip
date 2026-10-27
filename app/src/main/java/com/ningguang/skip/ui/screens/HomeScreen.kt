@@ -166,7 +166,7 @@ fun HomeScreen() {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Filled.Shield, null,
+                        Icons.Rounded.Shield, null,
                         tint = GlowWarm,
                         modifier = Modifier.size(22.dp)
                     )
@@ -183,7 +183,7 @@ fun HomeScreen() {
                 Spacer(Modifier.height(14.dp))
                 NingguangButton(
                     text = "去开启",
-                    icon = Icons.Filled.Bolt,
+                    icon = Icons.Rounded.Bolt,
                     glow = GlowWarm,
                     onClick = { openAccessibilitySettings(context) }
                 )
@@ -211,7 +211,7 @@ fun HomeScreen() {
             NingguangListItem(
                 title = "通用跳过",
                 subtitle = "内置关键词与控件 ID，装完即用",
-                icon = Icons.Filled.Bolt,
+                icon = Icons.Rounded.Bolt,
                 iconTint = GlowCyan,
                 glow = GlowCyan
             ) {
@@ -224,7 +224,7 @@ fun HomeScreen() {
             NingguangListItem(
                 title = "规则引擎",
                 subtitle = "按应用自定义规则，支持订阅导入",
-                icon = Icons.Filled.Shield,
+                icon = Icons.Rounded.Shield,
                 iconTint = GlowViolet,
                 glow = GlowViolet
             ) {
@@ -377,7 +377,7 @@ private fun GlowCore(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = if (active) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                imageVector = if (active) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 contentDescription = null,
                 tint = if (active) glow else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(44.dp)

@@ -85,7 +85,7 @@ fun SubscriptionPanel(onDismiss: () -> Unit) {
                     )
                 }
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Filled.Close, null)
+                    Icon(Icons.Rounded.Close, null)
                 }
             }
 
@@ -108,7 +108,7 @@ fun SubscriptionPanel(onDismiss: () -> Unit) {
             Spacer(Modifier.height(10.dp))
             NingguangButton(
                 text = if (working) "正在添加…" else "添加订阅",
-                icon = if (working) null else Icons.Filled.Add,
+                icon = if (working) null else Icons.Rounded.Add,
                 glow = GlowCyan,
                 enabled = !working && input.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
@@ -143,7 +143,7 @@ fun SubscriptionPanel(onDismiss: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 NingguangButton(
                     text = if (working && workingId == "*") "正在检查…" else "检查全部更新",
-                    icon = if (working && workingId == "*") null else Icons.Filled.Sync,
+                    icon = if (working && workingId == "*") null else Icons.Rounded.CloudSync,
                     glow = GlowCyan,
                     filled = false,
                     enabled = !working,
@@ -269,7 +269,7 @@ private fun SubscriptionItem(
                 } else {
                     NingguangButton(
                         text = "更新",
-                        icon = Icons.Filled.Refresh,
+                        icon = Icons.Rounded.Refresh,
                         glow = GlowCyan,
                         filled = false,
                         modifier = Modifier.fillMaxWidth(),
@@ -280,7 +280,7 @@ private fun SubscriptionItem(
             Box(modifier = Modifier.weight(1f)) {
                 NingguangButton(
                     text = "删除",
-                    icon = Icons.Filled.Delete,
+                    icon = Icons.Rounded.Delete,
                     glow = GlowWarm,
                     filled = false,
                     modifier = Modifier.fillMaxWidth(),

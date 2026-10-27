@@ -1,81 +1,39 @@
 package com.ningguang.skip.ui.overlay
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.TypedValue
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Bolt
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.savedstate.SavedStateRegistry
-import androidx.savedstate.SavedStateRegistryController
-import androidx.savedstate.SavedStateRegistryOwner
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
-import com.ningguang.skip.ui.glow.ningguangGlass
-import com.ningguang.skip.ui.theme.GlowCyan
-import com.ningguang.skip.ui.theme.NingguangTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlin.math.roundToInt
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import com.ningguang.skip.R
 
 /**
- * 跳过时的凝光悬浮提示。
+ * 跳过时的凝光悬浮胶囊。
  *
- * 在别的应用上方弹一枚半透明玻璃胶囊，1.8 秒后自动向上滑出消失。
- * 窗口带 FLAG_NOT_TOUCHABLE / FLAG_NOT_FOCUSABLE，只做展示，绝不拦截用户的点击与输入。
+ * 用原生 View 实现，不走 Compose —— 悬浮窗的 context 不是 Activity，
+ * 用 ComposeView 需要自己造 LifecycleOwner / SavedStateRegistry 宿主，
+ * 而 ViewTreeLifecycleOwner 这类宿主类在编译期不可见，容易踩坑。
+ * 原生 View 没有这个依赖，也能做出同样的玻璃质感。
+ *
+ * 窗口带 NOT_TOUCHABLE / NOT_FOCUSABLE，只做展示，绝不拦截用户对下层应用的点击。
  */
 object GlowToast {
 
     private const val SHOW_MS = 1800L
     private const val EXIT_MS = 340L
 
-    data class Payload(val appName: String, val text: String, val at: Long = System.currentTimeMillis())
-
-    private val current = MutableStateFlow<Payload?>(null)
     private val mainHandler = Handler(Looper.getMainLooper())
-
     private var wm: WindowManager? = null
-    private var view: ComposeView? = null
-    private var owner: OverlayLifecycleOwner? = null
+    private var view: View? = null
     private var hideRunnable: Runnable? = null
 
     fun canOverlay(context: Context): Boolean {
@@ -88,62 +46,48 @@ object GlowToast {
         mainHandler.post {
             val manager = context.getSystemService(WindowManager::class.java) ?: return@post
             cancelPendingHide()
-            current.value = Payload(appName, text)
-            if (view == null) attach(manager, context)
+            removeNow()
+
+            val capsule = buildCapsule(context, appName, text)
+            val added = runCatching {
+                manager.addView(capsule, buildParams(context))
+                true
+            }.getOrDefault(false)
+            if (!added) return@post
+
+            wm = manager
+            view = capsule
+
+            // 入场：从上方滑入 + 淡入
+            capsule.alpha = 0f
+            capsule.translationY = -56f
+            capsule.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(260)
+                .start()
+
             scheduleHide()
         }
     }
 
-    /** 服务停止时把窗口收干净，避免残留 */
+    /** 服务停止时收干净，避免悬浮窗残留 */
     fun release() {
         mainHandler.post {
             cancelPendingHide()
-            current.value = null
-            detach()
+            removeNow()
         }
-    }
-
-    @SuppressLint("InflateParams")
-    private fun attach(manager: WindowManager, context: Context) {
-        val lifecycleOwner = OverlayLifecycleOwner().apply { start() }
-        val composeView = ComposeView(context).apply {
-            ViewTreeLifecycleOwner.set(this, lifecycleOwner)
-            ViewTreeSavedStateRegistryOwner.set(this, lifecycleOwner)
-            setContent {
-                NingguangTheme {
-                    val payload by current.collectAsStateWithLifecycle()
-                    GlowCapsule(
-                        payload = payload,
-                        onExitFinished = { detach() }
-                    )
-                }
-            }
-        }
-        runCatching {
-            manager.addView(composeView, buildParams(context))
-            wm = manager
-            view = composeView
-            owner = lifecycleOwner
-        }.onFailure {
-            lifecycleOwner.destroy()
-        }
-    }
-
-    private fun detach() {
-        val manager = wm
-        val v = view
-        if (manager != null && v != null) runCatching { manager.removeView(v) }
-        owner?.destroy()
-        wm = null
-        view = null
-        owner = null
     }
 
     private fun scheduleHide() {
         val r = Runnable {
-            current.value = null
-            hideRunnable = Runnable { detach() }
-            mainHandler.postDelayed(hideRunnable!!, EXIT_MS)
+            val v = view ?: return@Runnable
+            v.animate()
+                .alpha(0f)
+                .translationY(-48f)
+                .setDuration(EXIT_MS)
+                .withEndAction { removeNow() }
+                .start()
         }
         hideRunnable = r
         mainHandler.postDelayed(r, SHOW_MS)
@@ -154,6 +98,79 @@ object GlowToast {
         hideRunnable = null
     }
 
+    private fun removeNow() {
+        val manager = wm
+        val v = view
+        if (manager != null && v != null) {
+            runCatching { manager.removeView(v) }
+        }
+        wm = null
+        view = null
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* 胶囊本体                                                            */
+    /* ------------------------------------------------------------------ */
+
+    private fun buildCapsule(context: Context, appName: String, text: String): View {
+        val dp = context.resources.displayMetrics.density
+        val padH = (18 * dp).toInt()
+        val padV = (9 * dp).toInt()
+
+        val root = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(padH, padV, padH, padV)
+            background = GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                intArrayOf(0xE61A1F2C.toInt(), 0xE60E1220.toInt())
+            ).apply {
+                cornerRadius = 30 * dp
+                // 光感描边：一道偏冷的高光边，模拟凝光的边缘光
+                setStroke((1.5 * dp).toInt(), 0x804FD8FF.toInt())
+            }
+            elevation = 14 * dp
+        }
+
+        val icon = ImageView(context).apply {
+            setImageResource(R.drawable.ic_glow_bolt)
+            setColorFilter(0xFF4FD8FF.toInt())
+            layoutParams = LinearLayout.LayoutParams((22 * dp).toInt(), (22 * dp).toInt()).apply {
+                marginEnd = (10 * dp).toInt()
+            }
+        }
+        root.addView(icon)
+
+        val textCol = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        val title = TextView(context).apply {
+            this.text = "已跳过 ${appName.ifBlank { "广告" }} 的广告"
+            setTextColor(0xFFF2F5FB.toInt())
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            paint.isFakeBoldText = true
+            maxLines = 1
+        }
+        textCol.addView(title)
+
+        if (text.isNotBlank()) {
+            val sub = TextView(context).apply {
+                this.text = text
+                setTextColor(0xFF9AA4BA.toInt())
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+                maxLines = 1
+            }
+            textCol.addView(sub)
+        }
+        root.addView(textCol)
+        return root
+    }
+
     private fun buildParams(context: Context): WindowManager.LayoutParams {
         val type = if (Build.VERSION.SDK_INT >= 26) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -161,6 +178,7 @@ object GlowToast {
             @Suppress("DEPRECATION")
             WindowManager.LayoutParams.TYPE_PHONE
         }
+        val dp = context.resources.displayMetrics.density
         return WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -173,116 +191,10 @@ object GlowToast {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-            // 落在状态栏下方一点，不遮挡时钟与通知（y 是像素，要按密度换算）
-            y = (36 * context.resources.displayMetrics.density).roundToInt()
+            // 落在状态栏下方，不遮挡时钟与通知
+            y = (36 * dp).toInt()
             x = 0
             windowAnimations = 0
         }
-    }
-}
-
-/* ---------------------------------------------------------------------------
- * 凝光胶囊
- * ------------------------------------------------------------------------- */
-
-@Composable
-private fun GlowCapsule(payload: GlowToast.Payload?, onExitFinished: () -> Unit) {
-    val configuration = LocalConfiguration.current
-    val maxWidth = (configuration.screenWidthDp.dp - 56.dp).coerceAtLeast(200.dp)
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        AnimatedVisibility(
-            visible = payload != null,
-            enter = slideInVertically(initialOffsetY = { -it }) +
-                fadeIn() +
-                scaleIn(initialScale = 0.88f),
-            exit = slideOutVertically(targetOffsetY = { -it }) +
-                fadeOut() +
-                scaleOut(targetScale = 0.92f)
-        ) {
-            if (payload != null) {
-                CapsuleBody(payload = payload, maxWidth = maxWidth)
-            }
-        }
-    }
-
-    LaunchedEffect(payload == null) {
-        if (payload == null) {
-            // 等退出动画播完再拆窗口，避免胶囊直接闪没
-            delay(340)
-            onExitFinished()
-        }
-    }
-}
-
-@Composable
-private fun CapsuleBody(payload: GlowToast.Payload, maxWidth: Dp) {
-    val shape = RoundedCornerShape(30.dp)
-    val cs = MaterialTheme.colorScheme
-
-    Box(
-        modifier = Modifier
-            .widthIn(max = maxWidth)
-            .height(58.dp)
-            .then(Modifier.ningguangGlass(shape = shape, glow = GlowCyan, stateGlow = 0.85f))
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = Icons.Filled.Bolt,
-                contentDescription = null,
-                tint = GlowCyan,
-                modifier = Modifier.size(22.dp)
-            )
-            Spacer(Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f, fill = false)) {
-                Text(
-                    text = "已跳过 ${payload.appName.ifBlank { "广告" }} 的广告",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1
-                )
-                if (payload.text.isNotBlank()) {
-                    Text(
-                        text = payload.text,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = cs.onSurfaceVariant,
-                        maxLines = 1
-                    )
-                }
-            }
-        }
-    }
-}
-
-/* ---------------------------------------------------------------------------
- * 悬浮窗里的生命周期宿主（Compose 需要）
- * ------------------------------------------------------------------------- */
-
-private class OverlayLifecycleOwner :
-    LifecycleOwner, SavedStateRegistryOwner {
-
-    private val lifecycleRegistry = LifecycleRegistry(this)
-    private val savedStateController = SavedStateRegistryController.create(this)
-
-    override val lifecycle: Lifecycle get() = lifecycleRegistry
-    override val savedStateRegistry: SavedStateRegistry get() = savedStateController.savedStateRegistry
-
-    fun start() {
-        savedStateController.performRestore(null)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    }
-
-    fun destroy() {
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }
 }

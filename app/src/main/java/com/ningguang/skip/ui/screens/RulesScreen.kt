@@ -99,14 +99,14 @@ fun RulesScreen() {
             ) {
                 NingguangButton(
                     text = "新建",
-                    icon = Icons.Filled.Add,
+                    icon = Icons.Rounded.Add,
                     glow = GlowCyan,
                     modifier = Modifier.weight(1f),
                     onClick = { editing = Rule(action = RuleAction.CLICK) }
                 )
                 NingguangButton(
                     text = "导入",
-                    icon = Icons.Filled.Download,
+                    icon = Icons.Rounded.Download,
                     glow = GlowViolet,
                     filled = false,
                     modifier = Modifier.weight(1f),
@@ -124,7 +124,7 @@ fun RulesScreen() {
                     } else {
                         "共 ${subs.size} 个源 · ${rules.count { it.isFromSubscription() }} 条订阅规则"
                     },
-                    icon = Icons.Filled.Sync,
+                    icon = Icons.Rounded.CloudSync,
                     iconTint = GlowCyan,
                     glow = GlowCyan,
                     onClick = { showSubs = true }
@@ -253,7 +253,7 @@ private fun RuleItem(rule: Rule, onToggle: (Boolean) -> Unit, onEdit: () -> Unit
     NingguangListItem(
         title = rule.name.ifBlank { "未命名规则" },
         subtitle = detail.ifBlank { "点击编辑，填写匹配条件" },
-        icon = Icons.Filled.List,
+        icon = Icons.Rounded.Rule,
         iconTint = if (rule.builtIn) GlowViolet else GlowCyan,
         glow = if (rule.builtIn) GlowViolet else GlowCyan,
         onClick = onEdit
@@ -302,7 +302,7 @@ private fun RuleEditor(
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Filled.Close, null)
+                    Icon(Icons.Rounded.Close, null)
                 }
             }
             Spacer(Modifier.height(10.dp))
@@ -335,7 +335,7 @@ private fun RuleEditor(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NingguangButton(
                     text = "删除",
-                    icon = Icons.Filled.Delete,
+                    icon = Icons.Rounded.Delete,
                     glow = GlowWarm,
                     filled = false,
                     modifier = Modifier.weight(1f),
@@ -343,7 +343,7 @@ private fun RuleEditor(
                 )
                 NingguangButton(
                     text = "保存",
-                    icon = Icons.Filled.Edit,
+                    icon = Icons.Rounded.Edit,
                     glow = GlowCyan,
                     modifier = Modifier.weight(1f),
                     onClick = {
@@ -428,7 +428,7 @@ private fun ImportDialog(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, null) }
+                IconButton(onClick = onDismiss) { Icon(Icons.Rounded.Close, null) }
             }
             Text(
                 "粘贴规则 JSON 数组即可导入；也可以先把现有规则导出到剪贴板，改完再粘回来。",
@@ -451,7 +451,7 @@ private fun ImportDialog(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NingguangButton(
                     text = "导出",
-                    icon = Icons.Filled.Upload,
+                    icon = Icons.Rounded.Upload,
                     filled = false,
                     glow = GlowViolet,
                     modifier = Modifier.weight(1f),
@@ -459,7 +459,7 @@ private fun ImportDialog(
                 )
                 NingguangButton(
                     text = "导入",
-                    icon = Icons.Filled.Download,
+                    icon = Icons.Rounded.Download,
                     glow = GlowCyan,
                     modifier = Modifier.weight(1f),
                     onClick = { onImport(text) }

@@ -57,7 +57,8 @@ ColorOS 17 的流体设计由三件事构成，本项目逐条落地：
 - 命中广告按钮后，在屏幕顶部弹一枚圆角玻璃胶囊（青色状态光 + 光感描边 + 闪电图标 + 「已跳过 XX 的广告 / 命中文本」），1.8 秒后向上滑出
 - 入场为「下滑 + 淡入 + 轻微放大」，退出为「上滑 + 淡出 + 轻微缩小」，与流体动效同一套节奏
 - 窗口带 `NOT_FOCUSABLE / NOT_TOUCHABLE / NOT_TOUCH_MODAL`，只做展示，绝不拦截用户对下层应用的点击
-- 用 `ComposeView` 渲染，自己提供 `LifecycleOwner` 与 `SavedStateRegistryOwner`；显示时 `addView`、动画结束后 `removeView`，不常驻、不留残余窗口
+- 用**原生 View** 渲染（`GradientDrawable` 做玻璃底 + 光感描边 + 闪电图标）。不用 ComposeView，是因为悬浮窗的 context 不是 Activity，得自己造 `LifecycleOwner` 宿主，而 `ViewTreeLifecycleOwner` 这类宿主类在编译期不可见；原生 View 绕开了这一整层依赖
+- 显示时 `addView`，出场动画结束后 `removeView`，不常驻、不留残余窗口
 - 未授予悬浮窗权限时自动回退为通知，保证反馈不丢；设置页可一键跳转授权、随时开关
 
 ---

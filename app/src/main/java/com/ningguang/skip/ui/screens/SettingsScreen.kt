@@ -95,7 +95,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "无障碍服务",
                 subtitle = if (isServiceEnabled(context)) "已开启 · 点击前往系统设置" else "未开启 · 点击前往开启",
-                icon = Icons.Filled.Shield,
+                icon = Icons.Rounded.Shield,
                 iconTint = GlowCyan,
                 glow = GlowCyan,
                 onClick = { openAccessibilitySettings(context) }
@@ -103,7 +103,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "电池优化白名单",
                 subtitle = "加入后更容易在后台常驻，避免被系统回收",
-                icon = Icons.Filled.Power,
+                icon = Icons.Rounded.BatterySaver,
                 iconTint = GlowWarm,
                 glow = GlowWarm,
                 onClick = { requestIgnoreBattery(context) }
@@ -157,7 +157,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "自定义关键词与控件 ID",
                 subtitle = "在内置词库之外追加，用 | 分隔",
-                icon = Icons.Filled.Title,
+                icon = Icons.Rounded.TextFields,
                 iconTint = GlowViolet,
                 glow = GlowViolet,
                 onClick = { showKeywords = !showKeywords }
@@ -214,7 +214,7 @@ fun SettingsScreen() {
                 } else {
                     "需要悬浮窗权限，点击前往授权"
                 },
-                icon = Icons.Filled.Launch,
+                icon = Icons.Rounded.OpenInNew,
                 iconTint = GlowCyan,
                 glow = GlowCyan,
                 onClick = { if (!overlayOk) openOverlayPermissionSettings(context) }
@@ -240,7 +240,7 @@ fun SettingsScreen() {
                 } else {
                     "跳过成功时发一条轻量通知"
                 },
-                icon = Icons.Filled.Notifications,
+                icon = Icons.Rounded.Notifications,
                 iconTint = GlowCyan
             ) {
                 NingguangSwitch(
@@ -251,7 +251,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "震动反馈",
                 subtitle = "跳过时轻微震动一下",
-                icon = Icons.Filled.TouchApp,
+                icon = Icons.Rounded.Vibration,
                 iconTint = GlowViolet
             ) {
                 NingguangSwitch(
@@ -271,7 +271,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "跟随系统深浅色",
                 subtitle = "关闭后可手动指定",
-                icon = Icons.Filled.ColorLens,
+                icon = Icons.Rounded.Palette,
                 iconTint = GlowCyan
             ) {
                 NingguangSwitch(
@@ -283,7 +283,7 @@ fun SettingsScreen() {
                 NingguangListItem(
                     title = "深色模式",
                     subtitle = "夜间更柔和",
-                    icon = Icons.Filled.ColorLens,
+                    icon = Icons.Rounded.Palette,
                     iconTint = GlowViolet
                 ) {
                     NingguangSwitch(
@@ -296,7 +296,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "凝光视效",
                 subtitle = "关闭后界面变为纯色，可省电",
-                icon = Icons.Filled.ColorLens,
+                icon = Icons.Rounded.Palette,
                 iconTint = GlowCyan
             ) {
                 NingguangSwitch(
@@ -337,7 +337,7 @@ fun SettingsScreen() {
                 } else {
                     "联网时每天检查一次，版本号变大才更新"
                 },
-                icon = Icons.Filled.Sync,
+                icon = Icons.Rounded.CloudSync,
                 iconTint = GlowCyan,
                 glow = GlowCyan,
                 onClick = {
@@ -360,7 +360,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "更新后通知我",
                 subtitle = "有新规则时发一条通知",
-                icon = Icons.Filled.Notifications,
+                icon = Icons.Rounded.Notifications,
                 iconTint = GlowViolet
             ) {
                 NingguangSwitch(
@@ -374,7 +374,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "立即检查一次",
                 subtitle = "不等周期任务，马上拉取全部订阅",
-                icon = Icons.Filled.Refresh,
+                icon = Icons.Rounded.Refresh,
                 iconTint = GlowGreen,
                 glow = GlowGreen,
                 onClick = { SubscriptionWorker.runOnce(context) }
@@ -390,7 +390,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "恢复内置规则",
                 subtitle = "把内置规则恢复为默认，自定义规则保留",
-                icon = Icons.Filled.Refresh,
+                icon = Icons.Rounded.Refresh,
                 iconTint = GlowWarm,
                 glow = GlowWarm,
                 onClick = { Prefs.resetBuiltInRules() }
@@ -398,7 +398,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "清空统计数据",
                 subtitle = "重置今日与累计跳过次数",
-                icon = Icons.Filled.Refresh,
+                icon = Icons.Rounded.Refresh,
                 iconTint = GlowWarm,
                 glow = GlowWarm,
                 onClick = { Prefs.resetCounters() }
@@ -406,7 +406,7 @@ fun SettingsScreen() {
             NingguangListItem(
                 title = "关于",
                 subtitle = "凝光跳过 v1.0.0 · 本地运行，不联网",
-                icon = Icons.Filled.Info,
+                icon = Icons.Rounded.Info,
                 iconTint = GlowCyan
             )
         }
