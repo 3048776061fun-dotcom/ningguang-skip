@@ -92,10 +92,10 @@ private fun NingguangSkipApp() {
             var selected by remember { mutableIntStateOf(0) }
             val tabs = remember {
                 listOf(
-                    IslandNavItem(Tab.Home.label, Icons.Rounded.Home),
-                    IslandNavItem(Tab.Rules.label, Icons.Rounded.Rule),
-                    IslandNavItem(Tab.Log.label, Icons.Rounded.History),
-                    IslandNavItem(Tab.Settings.label, Icons.Rounded.Settings),
+                    IslandNavItem(Tab.Home.label, Icons.Filled.Home),
+                    IslandNavItem(Tab.Rules.label, Icons.Filled.List),
+                    IslandNavItem(Tab.Log.label, Icons.Filled.History),
+                    IslandNavItem(Tab.Settings.label, Icons.Filled.Settings),
                 )
             }
 

@@ -39,6 +39,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+// 注意：var x by remember { mutableStateOf() } 依赖 getValue / setValue 这对扩展导入，
+// 它们只以 operator 形式被使用，不要当成「未使用的 import」删掉
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -96,14 +99,14 @@ fun RulesScreen() {
             ) {
                 NingguangButton(
                     text = "新建",
-                    icon = Icons.Rounded.Add,
+                    icon = Icons.Filled.Add,
                     glow = GlowCyan,
                     modifier = Modifier.weight(1f),
                     onClick = { editing = Rule(action = RuleAction.CLICK) }
                 )
                 NingguangButton(
                     text = "导入",
-                    icon = Icons.Rounded.Download,
+                    icon = Icons.Filled.Download,
                     glow = GlowViolet,
                     filled = false,
                     modifier = Modifier.weight(1f),
@@ -121,7 +124,7 @@ fun RulesScreen() {
                     } else {
                         "共 ${subs.size} 个源 · ${rules.count { it.isFromSubscription() }} 条订阅规则"
                     },
-                    icon = Icons.Rounded.CloudSync,
+                    icon = Icons.Filled.Sync,
                     iconTint = GlowCyan,
                     glow = GlowCyan,
                     onClick = { showSubs = true }
@@ -250,7 +253,7 @@ private fun RuleItem(rule: Rule, onToggle: (Boolean) -> Unit, onEdit: () -> Unit
     NingguangListItem(
         title = rule.name.ifBlank { "未命名规则" },
         subtitle = detail.ifBlank { "点击编辑，填写匹配条件" },
-        icon = Icons.Rounded.Rule,
+        icon = Icons.Filled.List,
         iconTint = if (rule.builtIn) GlowViolet else GlowCyan,
         glow = if (rule.builtIn) GlowViolet else GlowCyan,
         onClick = onEdit
@@ -299,7 +302,7 @@ private fun RuleEditor(
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Rounded.Close, null)
+                    Icon(Icons.Filled.Close, null)
                 }
             }
             Spacer(Modifier.height(10.dp))
@@ -332,7 +335,7 @@ private fun RuleEditor(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NingguangButton(
                     text = "删除",
-                    icon = Icons.Rounded.Delete,
+                    icon = Icons.Filled.Delete,
                     glow = GlowWarm,
                     filled = false,
                     modifier = Modifier.weight(1f),
@@ -340,7 +343,7 @@ private fun RuleEditor(
                 )
                 NingguangButton(
                     text = "保存",
-                    icon = Icons.Rounded.Edit,
+                    icon = Icons.Filled.Edit,
                     glow = GlowCyan,
                     modifier = Modifier.weight(1f),
                     onClick = {
@@ -425,7 +428,7 @@ private fun ImportDialog(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = onDismiss) { Icon(Icons.Rounded.Close, null) }
+                IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, null) }
             }
             Text(
                 "粘贴规则 JSON 数组即可导入；也可以先把现有规则导出到剪贴板，改完再粘回来。",
@@ -448,7 +451,7 @@ private fun ImportDialog(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 NingguangButton(
                     text = "导出",
-                    icon = Icons.Rounded.Upload,
+                    icon = Icons.Filled.Upload,
                     filled = false,
                     glow = GlowViolet,
                     modifier = Modifier.weight(1f),
@@ -456,7 +459,7 @@ private fun ImportDialog(
                 )
                 NingguangButton(
                     text = "导入",
-                    icon = Icons.Rounded.Download,
+                    icon = Icons.Filled.Download,
                     glow = GlowCyan,
                     modifier = Modifier.weight(1f),
                     onClick = { onImport(text) }

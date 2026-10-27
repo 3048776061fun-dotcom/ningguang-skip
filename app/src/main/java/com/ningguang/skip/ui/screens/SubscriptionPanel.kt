@@ -32,6 +32,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+// var x by remember { mutableStateOf() } 需要 setValue（与 getValue 成对），勿当作未使用导入删除
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -83,7 +85,7 @@ fun SubscriptionPanel(onDismiss: () -> Unit) {
                     )
                 }
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Rounded.Close, null)
+                    Icon(Icons.Filled.Close, null)
                 }
             }
 
@@ -106,7 +108,7 @@ fun SubscriptionPanel(onDismiss: () -> Unit) {
             Spacer(Modifier.height(10.dp))
             NingguangButton(
                 text = if (working) "正在添加…" else "添加订阅",
-                icon = if (working) null else Icons.Rounded.Add,
+                icon = if (working) null else Icons.Filled.Add,
                 glow = GlowCyan,
                 enabled = !working && input.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
@@ -141,7 +143,7 @@ fun SubscriptionPanel(onDismiss: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 NingguangButton(
                     text = if (working && workingId == "*") "正在检查…" else "检查全部更新",
-                    icon = if (working && workingId == "*") null else Icons.Rounded.CloudSync,
+                    icon = if (working && workingId == "*") null else Icons.Filled.Sync,
                     glow = GlowCyan,
                     filled = false,
                     enabled = !working,
@@ -267,7 +269,7 @@ private fun SubscriptionItem(
                 } else {
                     NingguangButton(
                         text = "更新",
-                        icon = Icons.Rounded.Refresh,
+                        icon = Icons.Filled.Refresh,
                         glow = GlowCyan,
                         filled = false,
                         modifier = Modifier.fillMaxWidth(),
@@ -278,7 +280,7 @@ private fun SubscriptionItem(
             Box(modifier = Modifier.weight(1f)) {
                 NingguangButton(
                     text = "删除",
-                    icon = Icons.Rounded.Delete,
+                    icon = Icons.Filled.Delete,
                     glow = GlowWarm,
                     filled = false,
                     modifier = Modifier.fillMaxWidth(),

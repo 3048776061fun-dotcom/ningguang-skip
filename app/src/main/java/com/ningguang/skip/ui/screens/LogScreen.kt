@@ -70,7 +70,7 @@ fun LogScreen() {
             NingguangListItem(
                 title = "清空日志",
                 subtitle = "删除全部跳过记录",
-                icon = Icons.Rounded.DeleteSweep,
+                icon = Icons.Filled.Delete,
                 iconTint = GlowWarm,
                 glow = GlowWarm,
                 modifier = Modifier.padding(horizontal = 18.dp),
@@ -95,8 +95,8 @@ fun LogScreen() {
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = if (log.success) Icons.Rounded.CheckCircle
-                                    else Icons.Rounded.ErrorOutline,
+                                    imageVector = if (log.success) Icons.Filled.Check
+                                    else Icons.Filled.Warning,
                                     contentDescription = null,
                                     tint = if (log.success) GlowGreen else GlowWarm,
                                     modifier = Modifier.size(20.dp)

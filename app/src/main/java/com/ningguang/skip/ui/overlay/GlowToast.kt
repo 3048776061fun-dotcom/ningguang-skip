@@ -235,7 +235,7 @@ private fun CapsuleBody(payload: GlowToast.Payload, maxWidth: Dp) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                imageVector = Icons.Rounded.Bolt,
+                imageVector = Icons.Filled.Bolt,
                 contentDescription = null,
                 tint = GlowCyan,
                 modifier = Modifier.size(22.dp)

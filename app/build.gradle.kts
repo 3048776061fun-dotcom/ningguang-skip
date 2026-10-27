@@ -69,8 +69,12 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    // 悬浮窗里的 ComposeView 需要自己提供 Lifecycle / SavedState 宿主
-    implementation("androidx.savedstate:savedstate-ktx:1.2.1")
+    // 悬浮窗里的 ComposeView 需要自己提供 Lifecycle / SavedState 宿主。
+    // 注意：下面两个是「底层 artifact」，必须显式声明 —— lifecycle-runtime-compose /
+    // savedstate-ktx 虽然会传递依赖它们，但传递过来的是 runtime 作用域，编译期不可见，
+    // 直接用 ViewTreeLifecycleOwner / ViewTreeSavedStateRegistryOwner 会 Unresolved reference。
+    implementation("androidx.lifecycle:lifecycle-runtime:2.7.0")
+    implementation("androidx.savedstate:savedstate:1.2.1")
     // 订阅规则的每日自动检查
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.core:core-ktx:1.12.0")
